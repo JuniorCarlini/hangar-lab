@@ -20,8 +20,13 @@
 </head>
 <body>
 <main>
+  {% if store %}
+  <h1>{{ store.name }}</h1>
+  <p class="sub">Loja de um cliente, no domínio próprio <code>{{ domain }}</code>{% if not store.active %} (desativada){% endif %}. Servida pelo mesmo app do Hangar Lab.</p>
+  {% else %}
   <h1>Hangar Lab</h1>
   <p class="sub">App de laboratório: web (Django) + worker (Celery) + PostgreSQL + Redis.</p>
+  {% endif %}
   <div class="grid">
     <div class="card"><b>PostgreSQL</b><span class="{% if db_ok %}ok{% else %}bad{% endif %}">{% if db_ok %}conectado{% else %}fora{% endif %}</span><br><small>{{ db_info }}</small></div>
     <div class="card"><b>Redis</b><span class="{% if redis_ok %}ok{% else %}bad{% endif %}">{% if redis_ok %}conectado{% else %}fora{% endif %}</span><br><small>{{ redis_info }}</small></div>

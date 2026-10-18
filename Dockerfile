@@ -11,7 +11,7 @@ COPY . .
 RUN useradd --create-home --uid 10001 app && chown -R app /app
 USER app
 
-ARG APP_VERSION=1.1
+ARG APP_VERSION=1.2
 ENV APP_VERSION=$APP_VERSION
 EXPOSE 8000
 ENTRYPOINT ["./docker-entrypoint.sh"]

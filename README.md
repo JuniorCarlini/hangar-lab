@@ -66,3 +66,22 @@ enquanto roda.
 ```bash
 docker compose up --build   # http://localhost:8000 (outra porta: PORT=8088 docker compose up --build)
 ```
+
+## Domínios dos clientes (lojas)
+
+O lab simula um SaaS: cada cliente tem uma loja no domínio próprio, e o
+Hangar emite o certificado na hora, só para lojas ativas.
+
+1. No Hangar, no serviço web: **Rede → Domínios → Aceitar domínios dos
+   clientes**. Faça **Deploy** para a app receber `HANGAR_DOMAIN_CHECK_SECRET`.
+2. No terminal do serviço, crie as lojas:
+   ```
+   python manage.py loja criar "Padaria da Ana" padaria.SEU-IP.nip.io
+   python manage.py loja listar
+   python manage.py loja desativar padaria.SEU-IP.nip.io
+   ```
+3. Abra `https://padaria.SEU-IP.nip.io`: a página mostra o nome da loja.
+
+O Hangar pergunta à app em `/.well-known/hangar/domain-check?domain=…`,
+com uma assinatura HMAC (veja `lab/domains.py`): 200 libera o certificado,
+404 recusa, 403 indica segredo errado.

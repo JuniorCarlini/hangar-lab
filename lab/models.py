@@ -14,3 +14,13 @@ class Job(models.Model):
     queued_at = models.DateTimeField(auto_now_add=True)
     done_at = models.DateTimeField(null=True)
     worker = models.CharField(max_length=64, blank=True)
+
+
+class Store(models.Model):
+    """A customer's store, reached at its own domain (Hangar's dynamic
+    domains: the certificate is issued only for active stores)."""
+
+    name = models.CharField(max_length=80)
+    domain = models.CharField(max_length=253, unique=True)
+    active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)

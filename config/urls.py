@@ -1,6 +1,6 @@
 from django.urls import path
 
-from lab import views
+from lab import domains, views
 
 urlpatterns = [
     path("", views.home),
@@ -10,4 +10,5 @@ urlpatterns = [
     path("api/cpu", views.cpu),
     path("api/job", views.job),
     path("api/stats", views.stats),
+    path(".well-known/hangar/domain-check", domains.domain_check),
 ]

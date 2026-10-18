@@ -11,6 +11,7 @@ from django.db import connection
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render
 
+from .domains import store_for
 from .models import Job, Visit
 from .tasks import finish_job
 
@@ -52,6 +53,7 @@ def home(request):
             "db_ok": db_ok, "db_info": db_info, "redis_ok": redis_ok, "redis_info": redis_info,
             "visits": visits, "hits": hits, "jobs_done": jobs_done, "last_job": last,
             "host": socket.gethostname(), "version": os.environ.get("APP_VERSION", "dev"),
+            "store": store_for(request) if db_ok else None, "domain": request.get_host(),
         },
     )
 
