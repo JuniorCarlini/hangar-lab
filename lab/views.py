@@ -102,4 +102,5 @@ def stats(request):
         "jobs_done": Job.objects.exclude(done_at=None).count(),
         "cache_hits": int(_redis.get("lab:cache") or 0),
         "host": socket.gethostname(),
+        "version": os.environ.get("APP_VERSION", "dev"),
     })
