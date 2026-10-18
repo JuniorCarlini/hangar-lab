@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Hangar Lab</title>
+<style>
+  body { margin: 0; font: 15px/1.5 system-ui, sans-serif; background: #0b0d12; color: #e6e8ee; display: grid; place-items: center; min-height: 100vh; }
+  main { width: min(640px, 100% - 32px); }
+  h1 { margin: 0 0 4px; font-size: 22px; }
+  p.sub { margin: 0 0 20px; color: #8b93a7; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 10px; }
+  .card { border: 1px solid #262b38; border-radius: 8px; padding: 14px; background: #12151d; }
+  .card b { display: block; font-size: 13px; color: #8b93a7; font-weight: 500; }
+  .card span { font-size: 18px; font-weight: 600; }
+  .ok { color: #3ecf8e; } .bad { color: #f0616d; }
+  code { color: #a5b4fc; }
+  footer { margin-top: 18px; color: #6b7386; font-size: 13px; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Hangar Lab</h1>
+  <p class="sub">App de laboratório: web (Django) + worker (Celery) + PostgreSQL + Redis.</p>
+  <div class="grid">
+    <div class="card"><b>PostgreSQL</b><span class="{% if db_ok %}ok{% else %}bad{% endif %}">{% if db_ok %}conectado{% else %}fora{% endif %}</span><br><small>{{ db_info }}</small></div>
+    <div class="card"><b>Redis</b><span class="{% if redis_ok %}ok{% else %}bad{% endif %}">{% if redis_ok %}conectado{% else %}fora{% endif %}</span><br><small>{{ redis_info }}</small></div>
+    <div class="card"><b>Visitas (no banco)</b><span>{{ visits|default:"—" }}</span></div>
+    <div class="card"><b>Contador (no Redis)</b><span>{{ hits|default:"—" }}</span></div>
+    <div class="card"><b>Jobs feitos pelo worker</b><span>{{ jobs_done|default:"0" }}</span><br><small>{% if last_job %}último: {{ last_job.worker }}{% else %}chame <code>/api/job</code>{% endif %}</small></div>
+    <div class="card"><b>Container</b><span>{{ host }}</span><br><small>versão {{ version }}</small></div>
+  </div>
+  <footer>Carga: <code>/api/write</code> · <code>/api/cache</code> · <code>/api/cpu?ms=20</code> · <code>/api/job</code> · <code>/api/stats</code></footer>
+</main>
+</body>
+</html>

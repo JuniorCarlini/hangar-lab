@@ -1,0 +1,70 @@
+# Hangar Lab: web (Django) + worker (Celery) + PostgreSQL + Redis.
+#
+# - Hangar > Novo serviço > Compose > "Ler do repositório": web e worker são
+#   construídos deste repositório (build: .).
+# - Colando este arquivo, web e worker usam a imagem pronta (image:).
+# - db e redis viram os templates do Hangar: senha gerada e as referências
+#   (DATABASE_URL, REDIS_URL) ligadas sozinhas. A senha abaixo é só local.
+# - Local: docker compose up --build  ->  http://localhost:8000
+
+services:
+  db:
+    image: postgres:18-alpine
+    environment:
+      POSTGRES_DB: app
+      POSTGRES_USER: app
+      POSTGRES_PASSWORD: senha-local
+    volumes:
+      - pgdata:/var/lib/postgresql
+
+  redis:
+    image: redis:8-alpine
+    command: redis-server --appendonly yes
+    volumes:
+      - redisdata:/data
+
+  web:
+    build: .
+    image: ghcr.io/juniorcarlini/hangar-lab:latest
+    command: gunicorn config.wsgi --bind 0.0.0.0:8000 --workers 3 --access-logfile -
+    expose:
+      - "8000"
+    ports:
+      - "${PORT:-8000}:8000"
+    environment:
+      DATABASE_URL: postgres://app:senha-local@db:5432/app
+      REDIS_URL: redis://redis:6379/0
+      CELERY_BROKER_URL: redis://redis:6379/1
+      DJANGO_ALLOWED_HOSTS: "*"
+      SECRET_KEY: ${SECRET_KEY:-troque-esta-chave}
+    depends_on:
+      - db
+      - redis
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+          cpus: "1"
+
+  worker:
+    build: .
+    image: ghcr.io/juniorcarlini/hangar-lab:latest
+    command: celery -A config worker --loglevel=info --concurrency=2
+    environment:
+      RUN_MIGRATIONS: "0"
+      DATABASE_URL: postgres://app:senha-local@db:5432/app
+      REDIS_URL: redis://redis:6379/0
+      CELERY_BROKER_URL: redis://redis:6379/1
+      SECRET_KEY: ${SECRET_KEY:-troque-esta-chave}
+    depends_on:
+      - db
+      - redis
+    deploy:
+      resources:
+        limits:
+          memory: 384M
+          cpus: "0.5"
+
+volumes:
+  pgdata:
+  redisdata:
